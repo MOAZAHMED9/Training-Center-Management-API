@@ -5,6 +5,7 @@ namespace Training_Center_Management_API.Models
     public class Instructor : BaseEntity
     {
         public string FullName { get; set; }
+
         [EmailAddress (ErrorMessage ="Email is Invalid")]
         public string Email { get; set; }
 

@@ -26,7 +26,7 @@ namespace Training_Center_Management_API.Services.Student
             var students = await _context.Students
                 .AsNoTracking()
                 //.Where(s => !s.IsDeleted)
-                .Select(s => new StudentDto
+                .Select(s => new StudentDto              //projection
                 {
 
                     FullName = s.FullName,
@@ -47,22 +47,12 @@ namespace Training_Center_Management_API.Services.Student
         public async Task<StudentDto?> GetByIdAsync(int id)
         {
 
-            //if (id < 1)
-            //{
-            //    return null;
-            //}
+            if (id <= 0 )
+            {
+                return null;
+            }
 
-            //var student = await _context.Students
-            //    .FirstOrDefaultAsync(s => s.Id == id);
-
-            //if (student == null)
-            //{
-            //    return NotFound();
-            //}
-
-
-
-
+           
 
             var student = await _context.Students
                 .Where(s => s.Id == id && !s.IsDeleted)
@@ -87,7 +77,7 @@ namespace Training_Center_Management_API.Services.Student
 
 
 
-        public async Task<StudentDto> CreateAsync(CreateStudentDto dto)
+        public async Task<StudentDto?> CreateAsync(CreateStudentDto dto)
         {
             var studentExist = await _context.Students
                 .AnyAsync(s => s.Email == dto.Email);
@@ -147,8 +137,7 @@ namespace Training_Center_Management_API.Services.Student
             student.Phone = dto.Phone;
             student.Address = dto.Address;
             student.Email = dto.Email;
-            student.UpdatedAt = DateTime.UtcNow;
-            student.UpdatedBy = "system";
+            
 
 
             await _context.SaveChangesAsync();
@@ -182,45 +171,18 @@ namespace Training_Center_Management_API.Services.Student
 
 
 
-        //public async Task  GetTopAsync()
-        //{
-        //    var students = _context.Enrollments
-        //       .GroupBy(e => new
-        //       {
-        //           e.StudentId,
-        //           e.Student.FullName,
-        //       })
-        //        .Select(g => new
-        //        {
-        //            FullName = g.Key.FullName,
-        //            AverageGrade = g.Average(e => e.Grade)
-        //        })
-        //        .OrderByDescending(x => x.AverageGrade)
-        //        .Take(3)
-        //        .ToListAsync();
-
-        //    return students;
-
-
-
-        //}
-
-
-
-
-
-
         
 
 
 
-        public async Task<StudentDetailsDto> GetStudentDetails(int id)
+        public async Task<StudentDetailsDto>? GetStudentDetails(int id)
         {
 
             var student = await _context.Students
-                .Where(s => s.Id == id && !s.IsDeleted)
+                .Where(s => s.Id ==id)
                 .Select(s => new StudentDetailsDto
                 {
+                    
                     //Id = s.Id,
                     FullName = s.FullName,
                     Email = s.Email,
@@ -350,11 +312,13 @@ namespace Training_Center_Management_API.Services.Student
                 query = query.OrderBy(s => s.Id);
             }
 
-            //var PageNumber = dto.PageNumber < 1 ? 1 : dto.PageNumber;
 
-            // =========================
-            // 6. Pagination
-            // =========================
+
+
+            //Pagination
+
+
+            var PageNumber = dto.PageNumber < 1 ? 1 : dto.PageNumber;
 
             var students = await query
                 .Skip((dto.PageNumber - 1) * dto.PageSize)
@@ -370,18 +334,14 @@ namespace Training_Center_Management_API.Services.Student
                 .ToListAsync();
 
 
-            // =========================
-            // 7. Calculate Total Pages
-            // =========================
+
             var totalCount = await query.CountAsync();
 
             var totalPages = (int)Math.Ceiling(
                 (double)totalCount / dto.PageSize);
 
 
-            // =========================
-            // 8. Response
-            // =========================
+            
 
             var result = new PagedResultDto<StudentSearchDto>
             {

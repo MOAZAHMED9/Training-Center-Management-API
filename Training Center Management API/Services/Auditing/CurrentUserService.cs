@@ -6,24 +6,18 @@ namespace Training_Center_Management_API.Services.Auditing
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CurrentUserService(
-            IHttpContextAccessor httpContextAccessor)
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public bool IsAuthenticated =>
-            _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated
-            ?? false;
+        public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
         public int? UserId
         {
             get
             {
-                var userId =
-                    _httpContextAccessor.HttpContext?
-                    .User?
-                    .FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (int.TryParse(userId, out var id))
                 {
@@ -34,10 +28,7 @@ namespace Training_Center_Management_API.Services.Auditing
             }
         }
 
-        public string? UserName =>
-            _httpContextAccessor.HttpContext?
-            .User?
-            .FindFirstValue(ClaimTypes.Name);
+        public string? UserName => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);  // لو اي طلب غلط رجع null
     }
 
 

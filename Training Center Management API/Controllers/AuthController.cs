@@ -41,6 +41,21 @@ namespace Training_Center_Management_API.Controllers
                 .Include(s=> s.Instructor)
                 .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
+            #region projection
+            //var user1 = await _context.Users
+            //    .Select(u=> new
+            //    {
+            //        u.Id,
+            //        u.FullName,
+            //        u.Email,
+            //        u.Role,
+            //        u.Student,
+            //        u.Instructor
+            //    })
+            //    .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            #endregion
+
+
             if (user == null)
             {
                 _logger.LogWarning("Failed login attempt for email: {Email} ip : {ip}",dto.Email,ip);
@@ -48,10 +63,10 @@ namespace Training_Center_Management_API.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            bool isPasswordValid =
-                BCrypt.Net.BCrypt.Verify(
-                    dto.Password,
-                    user.PasswordHash);
+
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+
+
 
             if (!isPasswordValid)
             {
@@ -62,25 +77,17 @@ namespace Training_Center_Management_API.Controllers
                 return Unauthorized("Invalidd email or password.");
             }
 
+
             var token = _jwtService.GenerateToken(user);
 
 
 
-            var refreshToken = _jwtService.GenerateRefreshToken();
+            var refreshToken = await _jwtService.GenerateRefreshToken(user);
 
 
-            user.RefreshTokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken);
-            user.RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
-            user.RefreshTokenRevokedAt = null;
-            await _context.SaveChangesAsync();
 
 
-            _logger.LogInformation(
-             "Successful login. UserId={UserId}, Email={Email}, IP={IP}",
-             user.Id,
-             user.Email,
-             ip
-            );
+            _logger.LogInformation("Successful login. UserId={UserId}, Email={Email}, IP={IP}", user.Id, user.Email, ip);
 
             return Ok(new
             {
@@ -88,46 +95,6 @@ namespace Training_Center_Management_API.Controllers
                 RefreshToken = refreshToken
             });
 
-
-
-
-
-
-
-
-            //return Ok(new
-            //{
-
-            //    Message = "Login successful",
-            //    AccessToken = token
-            //});
-
-
-
-
-
-            #region returnvalue
-            //return Ok(new
-            //{
-            //    user.Id,
-            //    user.Email,
-            //    user.Role,
-
-            //    Student = user.Student == null ? null : new
-            //    {
-            //        user.Student.Id,
-            //        user.Student.FullName,
-            //        user.Student.UserId
-            //    },
-
-            //    Instructor = user.Instructor == null ? null : new
-            //    {
-            //        user.Instructor.Id,
-            //        user.Instructor.FullName,
-            //        user.Instructor.UserId
-            //    }
-            //});
-            #endregion
 
         }
 
@@ -184,6 +151,8 @@ namespace Training_Center_Management_API.Controllers
 
 
             bool refreshValid = BCrypt.Net.BCrypt.Verify(dto.RefreshToken, user.RefreshTokenHash);
+
+
             
             if(!refreshValid)
             {
@@ -198,21 +167,11 @@ namespace Training_Center_Management_API.Controllers
                 return Unauthorized("Invalid refresh token.");
             }
 
-            var newAccessToken =
-                _jwtService.GenerateToken(user);
 
-            var newRefreshToken =
-               _jwtService.GenerateRefreshToken();
+            var newAccessToken = _jwtService.GenerateToken(user);
 
-            user.RefreshTokenHash =
-                BCrypt.Net.BCrypt.HashPassword(newRefreshToken);
+            var newRefreshToken =await _jwtService.GenerateRefreshToken(user);
 
-            user.RefreshTokenExpiresAt =
-                DateTime.UtcNow.AddDays(7);
-
-            user.RefreshTokenRevokedAt = null;
-
-            await _context.SaveChangesAsync();
 
             return Ok(new
             {

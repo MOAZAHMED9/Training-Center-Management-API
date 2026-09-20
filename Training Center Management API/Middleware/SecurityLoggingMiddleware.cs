@@ -7,9 +7,7 @@ namespace Training_Center_Management_API.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<SecurityLoggingMiddleware> _logger;
 
-        public SecurityLoggingMiddleware(
-            RequestDelegate next,
-            ILogger<SecurityLoggingMiddleware> logger)
+        public SecurityLoggingMiddleware(RequestDelegate next, ILogger<SecurityLoggingMiddleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -29,7 +27,6 @@ namespace Training_Center_Management_API.Middleware
                 var path = context.Request.Path.ToString();
 
 
-                // ✅ Centralized security log for authorization abuse
                 _logger.LogWarning(
                     "Forbidden access. UserId={UserId}, Path={Path}, IP={IP}",
                     userId,

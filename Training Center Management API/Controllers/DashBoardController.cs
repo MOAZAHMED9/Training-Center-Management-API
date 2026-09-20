@@ -7,7 +7,7 @@ namespace Training_Center_Management_API.Controllers
 {
     [Route("api/Dashboart")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
@@ -33,7 +33,6 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-        [AllowAnonymous]
         [HttpGet("top-students")]
         public async Task<IActionResult> GetTopStudents()
         {
@@ -61,8 +60,7 @@ namespace Training_Center_Management_API.Controllers
         [HttpGet("revenue-per-student")]
         public async Task<IActionResult> GetRevenuePerStudent()
         {
-            var result =
-                await _dashboardService.GetRevenuePerStudentAsync();
+            var result = await _dashboardService.GetRevenuePerStudentAsync();
 
             return Ok(result);
         }

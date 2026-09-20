@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Training_Center_Management_API.Data;
 using Training_Center_Management_API.Dtos.Enrollment;
 
@@ -65,7 +66,7 @@ namespace Training_Center_Management_API.Services.Enrollment
 
         public async Task<EnrollmentDto?> CreateAsync(CreateEnrollmentDto dto)
         {
-            //  Check Student
+           
             var studentExists = await _context.Students
                 .AnyAsync(s => s.Id == dto.StudentId);
 
@@ -75,7 +76,6 @@ namespace Training_Center_Management_API.Services.Enrollment
             }
 
 
-            //  Check Course
             var courseExists = await _context.Courses
                 .AnyAsync(c => c.Id == dto.CourseId);
 
@@ -85,10 +85,10 @@ namespace Training_Center_Management_API.Services.Enrollment
             }
 
 
-            //  chwck enrollment
             var alreadyEnrolled =
                 await _context.Enrollments
                     .AnyAsync(e => e.StudentId == dto.StudentId && e.CourseId == dto.CourseId);
+
 
             if (alreadyEnrolled)
             {
@@ -96,7 +96,6 @@ namespace Training_Center_Management_API.Services.Enrollment
             }
 
 
-            //  Create Enrollment
             var enrollment = new Models.Enrollment 
             {
                 StudentId = dto.StudentId,
@@ -114,8 +113,8 @@ namespace Training_Center_Management_API.Services.Enrollment
             await _context.SaveChangesAsync();
 
 
-            //  Return DTO
-            return await GetByIdAsync(enrollment.Id);    //// يسلام
+            
+            return await GetByIdAsync(enrollment.Id);    //// بتحفظو يعدين تجيب الid من الداتا بيز
         }
 
 
@@ -141,6 +140,8 @@ namespace Training_Center_Management_API.Services.Enrollment
         }
 
 
+
+
         public async Task<bool> DeleteAsync(int id)
         {
             var enrollment = await _context.Enrollments
@@ -153,7 +154,8 @@ namespace Training_Center_Management_API.Services.Enrollment
 
 
             // Soft Delete
-            enrollment.IsDeleted = true;          //اقدر اعملها hard كدا كدا دي علاقه 
+            enrollment.IsDeleted = true;       /// لو حزفت ال child الparent مش هيتاثر  
+            //اقدر اعملها hard كدا كدا دي علاقه 
 
             await _context.SaveChangesAsync();
 

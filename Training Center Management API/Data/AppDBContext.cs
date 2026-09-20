@@ -411,7 +411,6 @@ namespace Training_Center_Management_API.Data
         }
 
 
-
         public override async Task<int> SaveChangesAsync( CancellationToken cancellationToken = default)
         {
             ApplyAuditing();
@@ -423,8 +422,8 @@ namespace Training_Center_Management_API.Data
 
         private void ApplyAuditing()
         {
-            var entries = ChangeTracker
-                .Entries<BaseEntity>();
+
+            var entries = ChangeTracker.Entries<BaseEntity>();
 
             foreach (var entry in entries)
             {

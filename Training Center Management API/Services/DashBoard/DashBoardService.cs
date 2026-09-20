@@ -18,19 +18,36 @@ namespace Training_Center_Management_API.Services.DashBoard
             
         public async Task<DashboardDto> GetSummaryAsync()
         {
-            DashboardDto dto = new DashboardDto();
+            return new DashboardDto()
+            {
+                TotalCourses =  await _context.Courses.CountAsync(),
 
-            dto.TotalCourses = await _context.Courses.CountAsync();
+                TotalEnrollments = await _context.Enrollments.CountAsync(),
 
-            dto.TotalEnrollments = await _context.Enrollments.CountAsync();
+                TotalPayments = await _context.Payments.SumAsync(s=> s.Amount),
 
-            dto.TotalPayments = await _context.Payments.SumAsync(s=> s.Amount);
+                TotalInstructor= await _context.Instructors.CountAsync(),
 
-            dto.TotalInstructor= await _context.Instructors.CountAsync();
+                TotalStudents = await _context.Students.CountAsync()
 
-            dto.TotalStudents = await _context.Students.CountAsync();
+            };
 
-            return dto;
+
+
+            //DashboardDto dto = new DashboardDto();
+
+            //dto.TotalCourses = await _context.Courses.CountAsync();
+
+            //dto.TotalEnrollments = await _context.Enrollments.CountAsync();
+
+            //dto.TotalPayments = await _context.Payments.SumAsync(s=> s.Amount);
+
+            //dto.TotalInstructor= await _context.Instructors.CountAsync();
+
+            //dto.TotalStudents = await _context.Students.CountAsync();
+
+            //return dto;
+
 
 
         }

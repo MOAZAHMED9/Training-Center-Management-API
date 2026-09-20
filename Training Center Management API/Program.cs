@@ -34,15 +34,22 @@ namespace Training_Center_Management_API
             var builder = WebApplication.CreateBuilder(args);
 
 
+            builder.Services.AddControllers();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+         
+
+
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")
-            ));
+            ));      //بنعرف الcollection 
             // Add services to the container.
 
 
-            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddScoped<IAuthorizationHandler, StudentOwnerOrAdminHandler>(); // حقن ال handler
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();           // audit بنستخدمها لل
             builder.Services.AddScoped<IStudentService, StudentService>();
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
@@ -51,16 +58,12 @@ namespace Training_Center_Management_API
             builder.Services.AddScoped<ICourseInstructorService, CourseInstructorService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IDashboardService, DashBoardService>();
-            builder.Services.AddScoped<JwtService>();
+            builder.Services.AddScoped<JwtService>();            // تجهيز ال tocken
 
 
 
 
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-         
 
             builder.Services.AddSwaggerGen(options =>
             {
@@ -75,37 +78,37 @@ namespace Training_Center_Management_API
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-               Array.Empty<string>()
-               }
-                 });
-            });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                           Array.Empty<string>()
+
+                    }
+                });
+            });       //زرار ال authorize
 
 
 
 
-            builder.Services.AddScoped<IAuthorizationHandler, StudentOwnerOrAdminHandler>();
+
+
+             
+            #region   اعدادات الjwt يعني صحيحه ولا لا 
+
+            var jwtSettings = builder.Configuration.GetSection("Jwt");             // بيجيب قسم Jwt من الإعداداتjson          
+
+            var key = Encoding.UTF8.GetBytes( jwtSettings["Key"]!);    //بيحوّل المفتاح من نص إلى bytes، وبعدها ينشئ منه مفتاح يستخدم لتوقيع التوكن.
 
 
 
-
-
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
-
-            var key = Encoding.UTF8.GetBytes(
-                jwtSettings["Key"]!);
-
-
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)     //التاكد من اعداتات ال jwt
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters =
@@ -119,13 +122,12 @@ namespace Training_Center_Management_API
                             ValidIssuer = jwtSettings["Issuer"],
                             ValidAudience = jwtSettings["Audience"],
 
-                            IssuerSigningKey =
-                                new SymmetricSecurityKey(key),
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
 
                             ClockSkew = TimeSpan.Zero
                         };
                 });
-
+            #endregion            
 
 
 
@@ -139,16 +141,16 @@ namespace Training_Center_Management_API
 
                     limiterOptions.Window = TimeSpan.FromMinutes(1);
 
-                    limiterOptions.QueueLimit = 0;
+                    limiterOptions.QueueLimit = 0;                 //متخزنش طلب
                 });
 
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            });
+            });                    //   بولسي ال ليمت 
 
 
 
 
-            builder.Services.AddAuthorization(options =>
+            builder.Services.AddAuthorization(options =>                       // تجهيو الpolice
             {
                 options.AddPolicy("StudentOwner", policy =>
                 {
@@ -162,12 +164,8 @@ namespace Training_Center_Management_API
 
 
 
-            builder.Services.AddHttpContextAccessor();     ///
-
-
-
-
-
+            builder.Services.AddHttpContextAccessor();               //طريقة توصل للـ HttpContext الحالي
+                                                 //، والـ Authentication هو اللي بيحوّل الـ JWT إلى Claims ويحطها في HttpContext.User.
 
 
 
@@ -179,10 +177,10 @@ namespace Training_Center_Management_API
 
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>(); //بنعمل اوبجيكت من الكلاس
 
                 DbSeeder.Seed(context);
-            }
+            }      //DI  لل seed
 
 
 
@@ -211,29 +209,7 @@ namespace Training_Center_Management_API
 
             app.UseAuthorization();
 
-            //app.Use(async (context, next) =>
-            //{
-            //    await next();
-
-
-            //    if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
-            //    {
-            //        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
-            //        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            //        var path = context.Request.Path.ToString();
-
-
-            //        // ✅ Centralized security log for authorization abuse
-            //        app.Logger.LogWarning(
-            //            "Forbidden access. UserId={UserId}, Path={Path}, IP={IP}",
-            //            userId,
-            //            path,
-            //            ip
-            //        );
-            //    }
-            //});
-           
-
+         
 
             app.MapControllers();
 

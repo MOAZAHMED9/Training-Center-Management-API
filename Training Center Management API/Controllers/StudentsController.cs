@@ -20,14 +20,7 @@ namespace Training_Center_Management_API.Controllers
     [Authorize]
     public class StudentsController : ControllerBase                            
     {
-        //private readonly AppDbContext _context;                        //
-
-        //public StudentsController(AppDbContext context)
-        //{
-        //    _context = context;
-        //}     
-
-
+       
         private readonly IStudentService _studentService;                        //
 
         public StudentsController(IStudentService studentService)
@@ -42,6 +35,7 @@ namespace Training_Center_Management_API.Controllers
         [HttpGet ]
         public async Task<ActionResult<IEnumerable<StudentDto>>> GetStudents()
         {
+          
 
             var students = await _studentService.GetAllAsync();
 
@@ -52,60 +46,17 @@ namespace Training_Center_Management_API.Controllers
         }
 
 
-        [Authorize (Policy = "StudentOwner")]          /////////غلط 
+        [Authorize (Policy = "StudentOwner")]          
         [HttpGet("{id}")]
-        public async Task<ActionResult<StudentDto>> GetStudentByID(int id)   // اي الفرق
+        public async Task<ActionResult<StudentDto>> GetStudentByID(int id)   
         {
 
-            #region gogogaga
-            //var student = await _context.Students
-            //    .FirstOrDefaultAsync(s => s.Id == id);
 
-            //if (student == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return Ok(student);
-
-            //if (id < 1)
-            //{
-            //return BadRequest($"Not accepted ID {id}");
-            //}
-
-
-
-            //var student = await _context.Students
-            //    .Where(s => s.Id == id && !s.IsDeleted)
-            //    .Select(s => new StudentDto
-            //    {
-            //        //Id = s.Id,
-            //        FullName = s.FullName,
-            //        Email = s.Email,
-            //        Phone = s.Phone,
-            //        BirthDate = s.BirthDate,
-            //        Address = s.Address,
-            //        EnrollmentDate = s.EnrollmentDate
-            //    })
-            //    .FirstOrDefaultAsync();
-
-            #endregion
-
-            var student = _studentService.GetByIdAsync(id);
+            var student = await _studentService.GetByIdAsync(id);
             if (student == null)
                 return NotFound();
 
             return Ok(student);
-
-
-            //var authResult = await authorizationService.AuthorizeAsync(User, id, "StudentOwner");
-
-            //if (!authResult.Succeeded)
-            //{
-            //    return Forbid(); // 403
-            //}
-
-            //return Ok(student);
 
 
         }
@@ -118,46 +69,7 @@ namespace Training_Center_Management_API.Controllers
         [HttpPost]
         public async Task<ActionResult<StudentDto>> CreateStudent(CreateStudentDto dto)
         {
-            #region gogogo
-            //using var transaction = await _context.Database.BeginTransactionAsync();
-
-            //try
-            //{
-
-
-            //    var student = new Student
-            //    {
-            //        FullName = dto.FullName,
-            //        Email = dto.Email,
-            //        Phone = dto.Phone,
-            //        BirthDate = dto.BirthDate,
-            //        Address = dto.Address,
-
-            //        EnrollmentDate = DateTime.UtcNow,
-
-            //        CreatedAt = DateTime.UtcNow,
-            //        CreatedBy = "system",
-            //        IsDeleted = false
-            //    };
-
-            //    _context.Students.Add(student);
-
-            //    await _context.SaveChangesAsync();
-
-            //    await transaction.CommitAsync();
-
-
-            //var result = new StudentDto                    //  عملنا result علشان نرجع ال enrullmentdata
-            //{
-
-            //    FullName = student.FullName,
-            //    Email = student.Email,
-            //    Phone = student.Phone,
-            //    BirthDate = student.BirthDate,
-            //    Address = student.Address,
-            //    EnrollmentDate = student.EnrollmentDate
-            //};
-            #endregion
+            
 
             var student= await _studentService.CreateAsync(dto);
 
@@ -176,32 +88,7 @@ namespace Training_Center_Management_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStudent(int id , UpdateStudentDto dto)
         {
-            #region kukhg
-            //if (id < 1)
-            //{
-            //    return BadRequest($"Not accepted ID {id}");
-            //}
-
-
-            //var student = await _context.Students
-            //    .FirstOrDefaultAsync(s =>
-            //        s.Id == id &&
-            //        !s.IsDeleted);
-
-            //if (student == null)
-            //    return NotFound();
-
-            //student.FullName = dto.FullName;
-            //student.Email = dto.Email;
-            //student.Phone = dto.Phone;
-            //student.BirthDate = dto.BirthDate;
-            //student.Address = dto.Address;
-
-            //student.UpdatedAt = DateTime.UtcNow;
-            //student.UpdatedBy = "system";
-
-            //await _context.SaveChangesAsync();
-            #endregion
+            
 
             if (!await _studentService.UpdateAsync(id, dto))
             {
@@ -217,28 +104,7 @@ namespace Training_Center_Management_API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
-            #region hgfdjhfg
-            //if (id < 1)
-            //{
-            //    return BadRequest($"Not accepted ID {id}");
-            //}
-
-
-            //var student = await _context.Students
-            //    .FirstOrDefaultAsync(s =>
-            //        s.Id == id &&
-            //        !s.IsDeleted);
-
-            //if (student == null)
-            //    return NotFound();
-
-            //// Soft Delete
-            //student.IsDeleted = true;
-            //student.UpdatedAt = DateTime.UtcNow;
-            //student.UpdatedBy = "system";
-
-            //await _context.SaveChangesAsync();
-            #endregion
+           
 
             if(!await _studentService.DeleteAsync(id))
             {
@@ -250,58 +116,6 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-        /////////////////////////////////////////////////////  top
-        ////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////
-        ////[AllowAnonymous]
-        //[Authorize(Roles = "Admin,Instructor")]
-        //[HttpGet("GetTop")]
-        //public async Task<ActionResult> GetTop()
-        //{
-
-        //    var students = await _context.Enrollments
-        //        //.Where(e => !e.IsDeleted)
-
-        //        .GroupBy(e => new
-        //        {
-        //            e.StudentId,
-        //            e.Student.FullName,
-        //        })
-        //        .Select(g => new
-        //        {
-        //            FullName = g.Key.FullName,
-        //            AverageGrade = g.Average(e => e.Grade)
-        //        })
-        //        .OrderByDescending(x => x.AverageGrade)
-        //        .Take(3)
-        //        .ToListAsync();
-
-        //    return Ok(students);
-
-
-
-
-
-
-
-
-        //var student = await _context.Students.Where(s => !s.IsDeleted)
-        //    .Select(s => new
-        //    {
-        //        fullname = s.FullName,
-        //        AverageGrade = s.Enrollments
-        //    .Where(e => !e.IsDeleted)
-        //    .Average(e => e.Grade)
-        //    })
-        //    .OrderByDescending(s => s.AverageGrade)
-        //    .Take(3)
-        //    .ToListAsync();
-
-        //return Ok(student);
-        //} 
-
-
-      
 
 
 
@@ -309,49 +123,7 @@ namespace Training_Center_Management_API.Controllers
         [HttpGet("{id}/details")]
         public async Task<ActionResult<StudentDetailsDto>> GetStudentDetails(int id)
         {
-            #region ehfgf
-            //var student = await _context.Students
-            //    .Where(s => s.Id == id && !s.IsDeleted)
-            //    .Select(s => new StudentDetailsDto
-            //    {
-            //        //Id = s.Id,
-            //        FullName = s.FullName,
-            //        Email = s.Email,
-            //        EnrollmentDate = s.EnrollmentDate,
-
-            //        Enrollments = s.Enrollments
-            //            .Select(e => new EnrollmentDto
-            //            {
-            //                //CourseId = e.CourseId,
-            //                CourseName = e.Course.Name,
-            //                Grade = e.Grade,
-            //                Status = e.Status,
-            //                EnrollmentDate = e.EnrollmentDate
-            //            })
-            //            .ToList(),
-
-            //        Payments = s.Payments
-            //            .Select(p => new PaymentDto
-            //            {
-            //                Amount = p.Amount,
-            //                PaymentDate = p.PaymentDate,
-            //                PaymentMethod = p.PaymentMethod
-            //            })
-            //            .ToList(),
-
-            //        Certificates = s.Certificates
-            //            .Select(c => new CertificateDto
-            //            {
-            //                CertificateNumber = c.CertificateNumber,
-            //                CourseName = c.Course.Name,
-            //                IssueDate = c.IssueDate,
-            //                Grade = c.Grade
-            //            })
-            //            .ToList()
-            //    })
-            //    .FirstOrDefaultAsync();
-
-            #endregion
+            
 
             var student = await _studentService.GetStudentDetails(id);
 
@@ -424,12 +196,12 @@ namespace Training_Center_Management_API.Controllers
         ////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////                     
         ///
 
         [Authorize (Roles ="Admin,Instractor" ) ]
         [HttpGet ("SearchStudent") ]
-        public async Task<ActionResult<PagedResultDto<StudentSearchDto>>> SearchStudents([FromBody]StudentQueryDto dto)
+        public async Task<ActionResult<PagedResultDto<StudentSearchDto>>> SearchStudents([FromQuery]StudentQueryDto dto)    //?
         {
             var result = await _studentService.SearchStudents(dto);
 

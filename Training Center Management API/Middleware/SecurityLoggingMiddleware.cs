@@ -34,6 +34,21 @@ namespace Training_Center_Management_API.Middleware
                     ip
                 );
             }
+
+            if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
+            {
+                var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
+                var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                var path = context.Request.Path.ToString();
+
+
+                _logger.LogWarning(
+                    "Unauthorized access. UserId={UserId}, Path={Path}, IP={IP}",
+                    userId,
+                    path,
+                    ip
+                );
+            }
         }
     }
 }

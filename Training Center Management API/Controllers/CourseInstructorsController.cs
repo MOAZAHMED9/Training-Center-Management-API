@@ -12,8 +12,7 @@ namespace Training_Center_Management_API.Controllers
     public class CourseInstructorsController : ControllerBase
     {
 
-        private readonly ICourseInstructorService
-            _courseInstructorService;
+        private readonly ICourseInstructorService _courseInstructorService;
 
         public CourseInstructorsController( ICourseInstructorService courseInstructorService)
         {

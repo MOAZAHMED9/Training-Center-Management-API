@@ -199,7 +199,7 @@ namespace Training_Center_Management_API.Controllers
         ////////////////////////////////////////////////////////////////////                     
         ///
 
-        [Authorize (Roles ="Admin,Instractor" ) ]
+        [Authorize (Roles ="Admin,Instructor" ) ]
         [HttpGet ("SearchStudent") ]
         public async Task<ActionResult<PagedResultDto<StudentSearchDto>>> SearchStudents([FromQuery]StudentQueryDto dto)    //?
         {

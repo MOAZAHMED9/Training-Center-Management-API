@@ -12,8 +12,8 @@ using Training_Center_Management_API.Data;
 namespace Training_Center_Management_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260831150747_AddUsers")]
-    partial class AddUsers
+    [Migration("20260921072906_BuildDB")]
+    partial class BuildDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -166,7 +166,8 @@ namespace Training_Center_Management_API.Migrations
                     b.HasIndex("InstructorId");
 
                     b.HasIndex("CourseId", "InstructorId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("CourseInstructors", (string)null);
                 });
@@ -206,6 +207,9 @@ namespace Training_Center_Management_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Departments", (string)null);
                 });
@@ -257,7 +261,8 @@ namespace Training_Center_Management_API.Migrations
                     b.HasIndex("CourseId");
 
                     b.HasIndex("StudentId", "CourseId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Enrollments", (string)null);
                 });
@@ -310,10 +315,17 @@ namespace Training_Center_Management_API.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Instructors", (string)null);
                 });
@@ -419,10 +431,17 @@ namespace Training_Center_Management_API.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Students", (string)null);
                 });
@@ -458,6 +477,15 @@ namespace Training_Center_Management_API.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenRevokedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -546,6 +574,16 @@ namespace Training_Center_Management_API.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Training_Center_Management_API.Models.Instructor", b =>
+                {
+                    b.HasOne("Training_Center_Management_API.Models.User", "User")
+                        .WithOne("Instructor")
+                        .HasForeignKey("Training_Center_Management_API.Models.Instructor", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Training_Center_Management_API.Models.Payment", b =>
                 {
                     b.HasOne("Training_Center_Management_API.Models.Student", "Student")
@@ -555,6 +593,16 @@ namespace Training_Center_Management_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Training_Center_Management_API.Models.Student", b =>
+                {
+                    b.HasOne("Training_Center_Management_API.Models.User", "User")
+                        .WithOne("Student")
+                        .HasForeignKey("Training_Center_Management_API.Models.Student", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Training_Center_Management_API.Models.Course", b =>
@@ -581,6 +629,13 @@ namespace Training_Center_Management_API.Migrations
                     b.Navigation("Enrollments");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Training_Center_Management_API.Models.User", b =>
+                {
+                    b.Navigation("Instructor");
+
+                    b.Navigation("Student");
                 });
 #pragma warning restore 612, 618
         }

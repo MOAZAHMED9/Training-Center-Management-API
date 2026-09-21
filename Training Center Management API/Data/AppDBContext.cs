@@ -78,7 +78,7 @@ namespace Training_Center_Management_API.Data
                 u.Property(e => e.RefreshTokenHash);
                 u.Property(e => e.RefreshTokenExpiresAt);
                 u.Property(e => e.RefreshTokenRevokedAt);
-                
+
 
 
             });
@@ -90,6 +90,9 @@ namespace Training_Center_Management_API.Data
                 .Property(x => x.Name)
                 .IsRequired()
                 .HasMaxLength(100);
+                
+            modelBuilder.Entity<Department>(x =>
+            x.HasIndex(d => d.Name).IsUnique());
 
             modelBuilder.Entity<Department>()
                 .Property(x => x.Description)
@@ -247,7 +250,8 @@ namespace Training_Center_Management_API.Data
                     x.StudentId,
                     x.CourseId
                 })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");          ////////////////////////
 
 
             // =========================
@@ -280,7 +284,8 @@ namespace Training_Center_Management_API.Data
                     x.CourseId,
                     x.InstructorId
                 })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
 
 
             // =========================

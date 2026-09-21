@@ -19,6 +19,7 @@ namespace Training_Center_Management_API.Controllers
         }
 
 
+        [AllowAnonymous]
         [HttpGet("GetAll")]
         public async Task<ActionResult> GetAll()
         {
@@ -62,9 +63,7 @@ namespace Training_Center_Management_API.Controllers
         //[HttpPatch("{id}")]                                /////
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Instructor")]
-        public async Task<IActionResult> Update(
-            int id,
-            UpdateCourseDto dto)
+        public async Task<IActionResult> Update(int id, UpdateCourseDto dto)
         {
             var result =
                 await _courseService.UpdateAsync(id, dto);
@@ -82,8 +81,7 @@ namespace Training_Center_Management_API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result =
-                await _courseService.DeleteAsync(id);
+            var result = await _courseService.DeleteAsync(id);
 
             if (!result)
             {
@@ -94,7 +92,7 @@ namespace Training_Center_Management_API.Controllers
         }
 
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin,Instructor")]
         [HttpGet("Details{id}")]                            // نخلي بالنا من المسافات علشان طلعت باج
         public async Task<ActionResult<CourseDetails>> CourseDetails(int id)
         {

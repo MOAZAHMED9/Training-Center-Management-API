@@ -19,6 +19,7 @@ namespace Training_Center_Management_API.Data
                     );
                 }
 
+
                 if (!context.Students.Any())
                 {
                     context.Students.AddRange(
@@ -40,15 +41,14 @@ namespace Training_Center_Management_API.Data
                     );
                 }
 
-
-                if(!context.CourseInstructors.Any())
+                if (!context.CourseInstructors.Any())
                 {
                     context.CourseInstructors.AddRange(
                         NewData.courseInstructors);
                 }
 
 
-                if(!context.Enrollments.Any())
+                if (!context.Enrollments.Any())
                 {
                     context.Enrollments.AddRange(
                         NewData.enrollments);
@@ -63,23 +63,13 @@ namespace Training_Center_Management_API.Data
                 }
 
 
-                if(!context.Certificates.Any())
+                if (!context.Certificates.Any())
                 {
                     context.Certificates.AddRange(
                         NewData.Certificates);
 
                 }
 
-                //var user = new User()
-                //{
-                //    FullName = "Moaz ahmed",
-                //    Email = "admin@trainingcenter.com",
-                //    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
-                //    Role = "Admin",
-                //    CreatedBy="system"
-                //};
-
-                //context.Users.Add( user );
 
                 if (!context.Users.Any())
                 {

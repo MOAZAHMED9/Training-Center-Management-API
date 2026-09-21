@@ -13,8 +13,7 @@ namespace Training_Center_Management_API.Controllers
     {
         private readonly IPaymentService _paymentService;
 
-        public PaymentsController(
-            IPaymentService paymentService)
+        public PaymentsController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
         }

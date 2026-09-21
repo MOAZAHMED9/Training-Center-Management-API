@@ -20,7 +20,7 @@ namespace Training_Center_Management_API.Controllers
 
 
         [HttpGet]
-        [AllowAnonymous]
+        
         public async Task<IActionResult> GetAll()
         {
             var departments = await _departmentService.GetAllAsync();

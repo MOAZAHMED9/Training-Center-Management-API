@@ -8,7 +8,7 @@ namespace Training_Center_Management_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize (Roles ="Admin")]
     public class EnrollmentController : ControllerBase
     {
         private readonly IEnrollmentService _enrollmentService;
@@ -20,8 +20,7 @@ namespace Training_Center_Management_API.Controllers
 
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<EnrollmentDto>> GetAll()
         {
             var enrollments =
@@ -32,7 +31,7 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-
+        [Authorize(Roles = "Admin, Instructor")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -52,8 +51,7 @@ namespace Training_Center_Management_API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(
-            CreateEnrollmentDto dto)
+        public async Task<IActionResult> Create(CreateEnrollmentDto dto)
         {
             var enrollment =
                 await _enrollmentService.CreateAsync(dto);

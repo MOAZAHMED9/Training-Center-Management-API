@@ -19,7 +19,7 @@ namespace Training_Center_Management_API.Controllers
         private readonly AppDbContext _context;
         private readonly JwtService _jwtService;
 
-        public AuthController(AppDbContext context,JwtService jwtService, ILogger<AuthController> logger)
+        public AuthController(AppDbContext context, JwtService jwtService, ILogger<AuthController> logger)
         {
             _context = context;
             _jwtService = jwtService;
@@ -37,8 +37,8 @@ namespace Training_Center_Management_API.Controllers
 
 
             var user = await _context.Users
-                .Include(s=> s.Student)
-                .Include(s=> s.Instructor)
+                .Include(s => s.Student)
+                .Include(s => s.Instructor)
                 .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             #region projection
@@ -58,7 +58,7 @@ namespace Training_Center_Management_API.Controllers
 
             if (user == null)
             {
-                _logger.LogWarning("Failed login attempt for email: {Email} ip : {ip}",dto.Email,ip);
+                _logger.LogWarning("Failed login attempt for email: {Email} ip : {ip}", dto.Email, ip);
 
                 return Unauthorized("Invalid email or password.");
             }
@@ -112,7 +112,7 @@ namespace Training_Center_Management_API.Controllers
             var user = await _context.Users
                 .Include(u => u.Student)
                 .Include(u => u.Instructor)
-                .FirstOrDefaultAsync(u =>u.Email == dto.Email);
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (user == null)
             {
@@ -145,7 +145,7 @@ namespace Training_Center_Management_API.Controllers
                 );
 
                 return Unauthorized("Refresh token revoked.");
-                
+
             }
 
 
@@ -153,8 +153,8 @@ namespace Training_Center_Management_API.Controllers
             bool refreshValid = BCrypt.Net.BCrypt.Verify(dto.RefreshToken, user.RefreshTokenHash);
 
 
-            
-            if(!refreshValid)
+
+            if (!refreshValid)
             {
 
                 _logger.LogWarning(
@@ -170,7 +170,7 @@ namespace Training_Center_Management_API.Controllers
 
             var newAccessToken = _jwtService.GenerateToken(user);
 
-            var newRefreshToken =await _jwtService.GenerateRefreshToken(user);
+            var newRefreshToken = await _jwtService.GenerateRefreshToken(user);
 
 
             return Ok(new
@@ -180,6 +180,27 @@ namespace Training_Center_Management_API.Controllers
             });
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout(RefreshDto dto)
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+            if (user == null)
+            {
+                _logger.LogWarning("Logout attempt for non-existent user. Email={Email}, IP={IP}", dto.Email, ip);
+
+                return Unauthorized("Invalid refresh token.");
+            }
+
+            user.RefreshTokenRevokedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("User logged out successfully. UserId={UserId}, Email={Email}, IP={IP}", user.Id, user.Email, ip);
+
+            return Ok("Logged out successfully.");
+
+        }
     }
 }

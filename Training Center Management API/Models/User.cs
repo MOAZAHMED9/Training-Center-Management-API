@@ -18,8 +18,8 @@ namespace Training_Center_Management_API.Models
 
 
 
-        public string? RefreshTokenHash { get;  set; }
-        public DateTime? RefreshTokenExpiresAt { get;  set; }
-        public DateTime? RefreshTokenRevokedAt { get;  set; }
+        public string? RefreshTokenHash { get; set; }
+        public DateTime? RefreshTokenExpiresAt { get; set; }
+        public DateTime? RefreshTokenRevokedAt { get; set; }
     }
 }

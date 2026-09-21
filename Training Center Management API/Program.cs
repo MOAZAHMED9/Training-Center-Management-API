@@ -37,7 +37,18 @@ namespace Training_Center_Management_API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-         
+
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", policy =>
+                {
+                    policy
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });            //cors
 
 
 
@@ -192,7 +203,7 @@ namespace Training_Center_Management_API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("FrontendPolicy");
 
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();

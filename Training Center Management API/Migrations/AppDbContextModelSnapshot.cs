@@ -163,7 +163,8 @@ namespace Training_Center_Management_API.Migrations
                     b.HasIndex("InstructorId");
 
                     b.HasIndex("CourseId", "InstructorId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("CourseInstructors", (string)null);
                 });
@@ -203,6 +204,9 @@ namespace Training_Center_Management_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Departments", (string)null);
                 });
@@ -254,7 +258,8 @@ namespace Training_Center_Management_API.Migrations
                     b.HasIndex("CourseId");
 
                     b.HasIndex("StudentId", "CourseId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Enrollments", (string)null);
                 });

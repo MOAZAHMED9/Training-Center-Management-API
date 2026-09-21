@@ -131,11 +131,20 @@ namespace Training_Center_Management_API.Services.Course
                 return false;
             }
 
+            var foundCourseWithSameName = await _context.Courses
+                .AnyAsync(c => c.Name == dto.Name );
+            if (foundCourseWithSameName)
+            {
+                return false;
+            }
+
+
             course.Name = dto.Name;
             course.Description = dto.Description;
             course.Price = dto.Price;
             course.DepartmentId = dto.DepartmentId;
             course.DurationInHours = dto.DurationInHours;
+
 
             await _context.SaveChangesAsync();
 

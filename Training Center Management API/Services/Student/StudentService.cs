@@ -318,10 +318,10 @@ namespace Training_Center_Management_API.Services.Student
             //Pagination
 
 
-            var PageNumber = dto.PageNumber < 1 ? 1 : dto.PageNumber;
+            var pageNumber = dto.PageNumber < 1 ? 1 : dto.PageNumber;
 
             var students = await query
-                .Skip((dto.PageNumber - 1) * dto.PageSize)
+                .Skip((pageNumber - 1) * dto.PageSize)
                 .Take(dto.PageSize)
                 .Select(s => new StudentSearchDto
                 {
@@ -345,7 +345,7 @@ namespace Training_Center_Management_API.Services.Student
 
             var result = new PagedResultDto<StudentSearchDto>
             {
-                Page = dto.PageNumber,
+                Page = pageNumber,
                 PageSize = dto.PageSize,
                 TotalCount = totalCount,
                 TotalPages = totalPages,

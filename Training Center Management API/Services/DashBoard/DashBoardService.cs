@@ -60,7 +60,7 @@ namespace Training_Center_Management_API.Services.DashBoard
                .AsNoTracking()
                .GroupBy(s => new
                {
-                   s.Id,
+                   s.StudentId,
                    s.Student.FullName
 
                })

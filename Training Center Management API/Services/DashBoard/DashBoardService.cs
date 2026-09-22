@@ -33,23 +33,6 @@ namespace Training_Center_Management_API.Services.DashBoard
             };
 
 
-
-            //DashboardDto dto = new DashboardDto();
-
-            //dto.TotalCourses = await _context.Courses.CountAsync();
-
-            //dto.TotalEnrollments = await _context.Enrollments.CountAsync();
-
-            //dto.TotalPayments = await _context.Payments.SumAsync(s=> s.Amount);
-
-            //dto.TotalInstructor= await _context.Instructors.CountAsync();
-
-            //dto.TotalStudents = await _context.Students.CountAsync();
-
-            //return dto;
-
-
-
         }
 
 
@@ -75,16 +58,7 @@ namespace Training_Center_Management_API.Services.DashBoard
                .ToListAsync();
 
 
-            //var top = new List<TopStudent>();
-            //foreach (var item in student)
-            //{
-            //    top.Add(item);
-
-            //}
-
-            //return top;
-
-
+            
         }
 
 

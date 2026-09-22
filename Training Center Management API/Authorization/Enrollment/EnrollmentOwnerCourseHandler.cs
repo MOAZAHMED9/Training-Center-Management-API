@@ -25,7 +25,7 @@ namespace Training_Center_Management_API.Authorization.Enrollment
 
             var instructorIdClaim = context.User.FindFirstValue("InstructorId");
 
-            if (!int.TryParse(instructorIdClaim, out var instructorId))                         //حولنها علشان اسرش
+            if (!int.TryParse(instructorIdClaim, out var instructorId))                        
                 return;
 
                 
@@ -34,7 +34,7 @@ namespace Training_Center_Management_API.Authorization.Enrollment
 
             var enrollmentIdValue = httpContext.Request.RouteValues["id"]?.ToString();
 
-            if (!int.TryParse(enrollmentIdValue, out var enrollmentId))                         //حولنها علشان اسرش
+            if (!int.TryParse(enrollmentIdValue, out var enrollmentId))                         
                 return;
 
             

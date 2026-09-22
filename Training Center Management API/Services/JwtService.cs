@@ -22,11 +22,11 @@ namespace Training_Center_Management_API.Services
 
         public string GenerateToken(User user)
         {
-            var jwtSettings = _configuration.GetSection("Jwt");              //بجيب الاعدادات من الjson
+            var jwtSettings = _configuration.GetSection("Jwt");              
 
-            var key = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(jwtSettings["Key"]!));     //ننشاء المفاتح
+            var key = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(jwtSettings["Key"]!));      
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);       //الخوارزميات   
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);          
 
 
             var claims = new List<Claim>

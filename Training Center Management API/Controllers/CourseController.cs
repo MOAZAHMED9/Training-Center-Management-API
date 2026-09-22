@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Training_Center_Management_API.Dtos.common;
 using Training_Center_Management_API.Dtos.Courses;
 using Training_Center_Management_API.Services.Course;
 
@@ -106,6 +107,13 @@ namespace Training_Center_Management_API.Controllers
 
             return details;
 
+        }
+        [Authorize(Roles = "Admin,Instructor")]
+        [HttpGet("Search")]
+        public async Task<ActionResult<PagedResultDto<CourseDto>>> CourseSearch([FromQuery] CourseSearch search)
+        {
+            var result = await _courseService.CourseSearchAsync(search);
+            return Ok(result);
         }
 
     }

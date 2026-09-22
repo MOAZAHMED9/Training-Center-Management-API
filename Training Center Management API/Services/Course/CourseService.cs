@@ -69,10 +69,9 @@ namespace Training_Center_Management_API.Services.Course
                 .Select(s => s.Name)
                 .FirstOrDefaultAsync();
 
-            var courseexist = await _context.Courses              // تم تعديل
+            var courseexist = await _context.Courses              
                 .AnyAsync(c=> c.Name == dto.Name);
 
-            //.AnyAsync(d => d.Id == dto.DepartmentId);
 
             if (departmentExists == null || courseexist)
             {
@@ -101,14 +100,8 @@ namespace Training_Center_Management_API.Services.Course
                 Description = course.Description,
                 Price = course.Price,
                 DepartmentId = course.DepartmentId,
-
-                // هنجيب الاسم لأن الـ Navigation
-                // Property مش هتكون Loaded تلقائيًا
                 DepartmentName = departmentExists
-                //(await _context.Departments
-                //    .Where(d => d.Id == course.DepartmentId)
-                //    .Select(d => d.Name)
-                //    .FirstAsync())
+               
             };
         }
 
@@ -195,9 +188,7 @@ namespace Training_Center_Management_API.Services.Course
                     DepartmentName = c.Department.Name,
 
 
-                    //instructorNames = c.CourseInstructors
-                    //.Select(i => i.Instructor.FullName)
-                    //.ToList(),
+                    
 
 
                     Enrollments = c.Enrollments

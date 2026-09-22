@@ -62,7 +62,6 @@ namespace Training_Center_Management_API.Services.Payment
 
         public async Task<PaymentDto?> CreateAsync(CreatePaymentDto dto)
         {
-            // نتأكد إن الطالب موجود
             var studentExists = await _context.Students
                 .AnyAsync(s => s.Id == dto.StudentId);
 
@@ -78,8 +77,7 @@ namespace Training_Center_Management_API.Services.Payment
                 PaymentMethod = dto.PaymentMethod,
                 TransactionReference = dto.TransactionReference,
 
-                // التاريخ من السيرفر
-                PaymentDate = DateTime.UtcNow                                      // عايزيم نعدلوها 
+                PaymentDate = DateTime.UtcNow                                      
             };
 
             _context.Payments.Add(payment);

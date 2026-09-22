@@ -14,7 +14,7 @@ namespace Training_Center_Management_API.Services.Student
 
     public class StudentService : IStudentService
     {
-        private readonly AppDbContext _context;                        //
+        private readonly AppDbContext _context;                        
 
         public StudentService(AppDbContext context)
         {
@@ -27,7 +27,7 @@ namespace Training_Center_Management_API.Services.Student
             var students = await _context.Students
                 .AsNoTracking()
                 //.Where(s => !s.IsDeleted)
-                .Select(s => new StudentDto              //projection
+                .Select(s => new StudentDto              
                 {
 
                     FullName = s.FullName,
@@ -231,16 +231,6 @@ namespace Training_Center_Management_API.Services.Student
 
 
 
-        //public async Task<PagedResultDto<StudentSearchDto>> SearchStudents(
-        //string? search,
-        //string? email,
-        //int page = 1,
-        //int pageSize = 5,
-        //string? sortBy = null,
-        //bool descending = false)
-
-
-
         public async Task<PagedResultDto<StudentSearchDto>> SearchStudents(StudentQueryDto dto)
         {
 
@@ -359,7 +349,7 @@ namespace Training_Center_Management_API.Services.Student
 
         }
 
-        public async Task<bool> EditRoleToInstructor(int userid)
+        public async Task<bool> EditRoleToInstructor(int userid)      //want edit
         {
             
 

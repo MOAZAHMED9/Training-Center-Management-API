@@ -56,7 +56,7 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-
+        // عملنها auto
         //[HttpPost]
         //public async Task<IActionResult> Create(CreatePaymentDto dto)
         //{

@@ -118,37 +118,7 @@ namespace Training_Center_Management_API.Data
             }
             );
 
-            
-            //.Property(x => x.FullName)
-            //.IsRequired()
-            //.HasMaxLength(150) ;
-
-            //modelBuilder.Entity<Student>()
-            //    .Property(x => x.Email)
-            //    .IsRequired()
-            //    .HasMaxLength(150);
-
-            //modelBuilder.Entity<Student>()
-            //    .HasIndex(x => x.Email)
-            //    .IsUnique();
-
-            //modelBuilder.Entity<Student>()
-            //    .Property(x => x.Phone)
-            //    .HasMaxLength(20);
-
-            //modelBuilder.Entity<Student>()
-            //    .Property(x => x.Address)
-            //    .HasMaxLength(250);
-
-
-            // =========================
-            // Instructor
-            // =========================
-
-            //modelBuilder.Entity<Instructor>()
-            //    .Property(x => x.FullName)
-            //    .IsRequired()
-            //    .HasMaxLength(150);
+          
 
 
             modelBuilder.Entity<Instructor>(i => i.Property(e => e.FullName).IsRequired().HasMaxLength(150));
@@ -159,7 +129,7 @@ namespace Training_Center_Management_API.Data
                 .HasMaxLength(150);
 
             modelBuilder.Entity<Instructor>()
-                .HasIndex(x => x.Email)               ////////////////////////////////
+                .HasIndex(x => x.Email)               
                 .IsUnique();
 
             modelBuilder.Entity<Instructor>()
@@ -172,7 +142,7 @@ namespace Training_Center_Management_API.Data
 
             modelBuilder.Entity<Instructor>()
                 .Property(x => x.Salary)
-                .HasPrecision(18, 2);           ////////////////////////////////
+                .HasPrecision(18, 2);           
 
             modelBuilder.Entity<Instructor>()
                 .HasIndex(i => i.UserId)
@@ -196,22 +166,15 @@ namespace Training_Center_Management_API.Data
                 .HasPrecision(18, 2);
 
 
-            // =========================
-            // Department → Courses
-            // One Department
-            // Many Courses
-            // =========================
 
             modelBuilder.Entity<Course>()
                 .HasOne(x => x.Department)
                 .WithMany(x => x.Courses)
                 .HasForeignKey(x => x.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);               /////////////////////////////
+                .OnDelete(DeleteBehavior.Restrict);              
 
 
-            // =========================
-            // Enrollment
-            // =========================
+           
 
             modelBuilder.Entity<Enrollment>()
                 .Property(x => x.Status)
@@ -223,42 +186,35 @@ namespace Training_Center_Management_API.Data
                 .HasPrecision(5, 2);
 
 
-            // Student → Enrollment
-            // One Student → Many Enrollments
+           
 
             modelBuilder.Entity<Enrollment>()
                 .HasOne(x => x.Student)
                 .WithMany(x => x.Enrollments)
                 .HasForeignKey(x => x.StudentId)
-                .OnDelete(DeleteBehavior.Cascade);             ////////////////////////////////
+                .OnDelete(DeleteBehavior.Cascade);             
 
 
-            // Course → Enrollment
-            // One Course → Many Enrollments
+           
 
             modelBuilder.Entity<Enrollment>()
                 .HasOne(x => x.Course)
                 .WithMany(x => x.Enrollments)
                 .HasForeignKey(x => x.CourseId)
-                .OnDelete(DeleteBehavior.Cascade);              ////////////
+                .OnDelete(DeleteBehavior.Cascade);              
 
 
-            // Prevent duplicate enrollment
-            modelBuilder.Entity<Enrollment>()                        /////////////////////////
+            modelBuilder.Entity<Enrollment>()                        
                 .HasIndex(x => new
                 {
                     x.StudentId,
                     x.CourseId
                 })
                 .IsUnique()
-                .HasFilter("[IsDeleted] = 0");          ////////////////////////
+                .HasFilter("[IsDeleted] = 0");          
 
 
-            // =========================
-            // CourseInstructor
-            // =========================
-
-            // Course → CourseInstructor
+            
 
             modelBuilder.Entity<CourseInstructor>()
                 .HasOne(x => x.Course)
@@ -267,7 +223,6 @@ namespace Training_Center_Management_API.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            // Instructor → CourseInstructor
 
             modelBuilder.Entity<CourseInstructor>()
                 .HasOne(x => x.Instructor)
@@ -276,7 +231,6 @@ namespace Training_Center_Management_API.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            // Prevent duplicate Course + Instructor
 
             modelBuilder.Entity<CourseInstructor>()
                 .HasIndex(x => new
@@ -288,13 +242,11 @@ namespace Training_Center_Management_API.Data
                 .HasFilter("[IsDeleted] = 0");
 
 
-            // =========================
-            // Payment
-            // =========================
+           
 
             modelBuilder.Entity<Payment>()
                 .Property(x => x.Amount)
-                .HasPrecision(18, 2);                      //////////////////
+                .HasPrecision(18, 2);                      
 
             modelBuilder.Entity<Payment>()
                 .Property(x => x.PaymentMethod)
@@ -306,7 +258,6 @@ namespace Training_Center_Management_API.Data
                 .HasMaxLength(100);
 
 
-            // Student → Payments
 
             modelBuilder.Entity<Payment>()
                 .HasOne(x => x.Student)
@@ -315,9 +266,7 @@ namespace Training_Center_Management_API.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            // =========================
-            // Certificate
-            // =========================
+           
 
             modelBuilder.Entity<Certificate>()
                 .Property(x => x.CertificateNumber)
@@ -333,7 +282,6 @@ namespace Training_Center_Management_API.Data
                 .HasMaxLength(10);
 
 
-            // Student → Certificates
 
             modelBuilder.Entity<Certificate>()
                 .HasOne(x => x.Student)
@@ -342,18 +290,17 @@ namespace Training_Center_Management_API.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            // Course → Certificates
 
             modelBuilder.Entity<Certificate>()
                 .HasOne(x => x.Course)
-                .WithMany()                                 //////
+                .WithMany()                                 
                 .HasForeignKey(x => x.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
 
             modelBuilder.Entity<Student>()
-                .HasQueryFilter(x => !x.IsDeleted);  //////
+                .HasQueryFilter(x => !x.IsDeleted);  
 
             modelBuilder.Entity<Course>()
                 .HasQueryFilter(x => !x.IsDeleted);
@@ -378,41 +325,6 @@ namespace Training_Center_Management_API.Data
 
 
 
-
-            ////////////////////////////////// seeding data
-            ///
-
-
-            // =========================
-            // Seed Data
-            // =========================
-
-            //var createdAt = new DateTime(2026, 1, 1);
-
-            //// =========================
-            //// Departments
-            //// =========================
-
-            //modelBuilder.Entity<Department>().HasData(
-            //    new Department
-            //    {
-            //        Id = 1,
-            //        Name = "Programming",
-            //        Description = "Programming and Software Development",
-            //        CreatedAt = createdAt,
-            //        CreatedBy = "system",
-            //        IsDeleted = false
-            //    },
-            //    new Department
-            //    {
-            //        Id = 2,
-            //        Name = "Database",
-            //        Description = "Database and SQL Server",
-            //        CreatedAt = createdAt,
-            //        CreatedBy = "system",
-            //        IsDeleted = false
-            //    },
-            //   
         }
 
 
@@ -445,7 +357,7 @@ namespace Training_Center_Management_API.Data
 
                     entry.Entity.UpdatedBy = _currentUserService.UserName ?? "System";
 
-                    // منع تعديل بيانات الإنشاء ف الداتا بيز
+                    // //
                     entry.Property(x => x.CreatedAt)
                         .IsModified = false;
 

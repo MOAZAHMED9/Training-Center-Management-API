@@ -52,21 +52,20 @@ namespace Training_Center_Management_API
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
-            });            //cors
+            });           
 
 
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")
-            ));      //بنعرف الcollection 
-            // Add services to the container.
+            ));     
 
 
-            builder.Services.AddScoped<IAuthorizationHandler, EnrollmentOwnerCourseHandler>(); // حقن ال handler
-            builder.Services.AddScoped<IAuthorizationHandler, InstructorOwnerCourseHandler>(); // حقن ال handler
-            builder.Services.AddScoped<IAuthorizationHandler, StudentOwnerOrAdminHandler>(); // حقن ال handler
-            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();           // audit بنستخدمها لل
+            builder.Services.AddScoped<IAuthorizationHandler, EnrollmentOwnerCourseHandler>(); 
+            builder.Services.AddScoped<IAuthorizationHandler, InstructorOwnerCourseHandler>(); 
+            builder.Services.AddScoped<IAuthorizationHandler, StudentOwnerOrAdminHandler>(); 
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();           
             builder.Services.AddScoped<IStudentService, StudentService>();
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
@@ -76,8 +75,7 @@ namespace Training_Center_Management_API
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IDashboardService, DashBoardService>();
             builder.Services.AddScoped<ICertificateService, CertificateService>();
-            builder.Services.AddScoped<JwtService>();            // تجهيز ال tocken
-
+            builder.Services.AddScoped<JwtService>();           
 
 
 
@@ -110,7 +108,7 @@ namespace Training_Center_Management_API
 
                     }
                 });
-            });       //زرار ال authorize
+            });      
 
 
 
@@ -120,13 +118,13 @@ namespace Training_Center_Management_API
              
             #region   اعدادات الjwt يعني صحيحه ولا لا 
 
-            var jwtSettings = builder.Configuration.GetSection("Jwt");             // بيجيب قسم Jwt من الإعداداتjson          
+            var jwtSettings = builder.Configuration.GetSection("Jwt");                
 
-            var key = Encoding.UTF8.GetBytes( jwtSettings["Key"]!);    //بيحوّل المفتاح من نص إلى bytes، وبعدها ينشئ منه مفتاح يستخدم لتوقيع التوكن.
+            var key = Encoding.UTF8.GetBytes( jwtSettings["Key"]!);    
 
 
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)     //التاكد من اعداتات ال jwt
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)     
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters =
@@ -163,12 +161,12 @@ namespace Training_Center_Management_API
                 });
 
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            });                    //   بولسي ال ليمت 
+            });                   
 
 
 
 
-            builder.Services.AddAuthorization(options =>                       // تجهيو الpolice
+            builder.Services.AddAuthorization(options =>                     
             {
                 options.AddPolicy("StudentOwner", policy =>
                 {
@@ -179,7 +177,7 @@ namespace Training_Center_Management_API
             });
 
 
-            builder.Services.AddAuthorization(options =>                       // تجهيو الpolice
+            builder.Services.AddAuthorization(options =>                      
             {
                 options.AddPolicy("InstructorOwner", policy =>
                 {
@@ -190,7 +188,7 @@ namespace Training_Center_Management_API
             });
 
 
-            builder.Services.AddAuthorization(options =>                       // تجهيو الpolice
+            builder.Services.AddAuthorization(options =>                      
             {
                 options.AddPolicy("EnrollmentOwner", policy =>
                 {
@@ -204,8 +202,7 @@ namespace Training_Center_Management_API
 
 
 
-            builder.Services.AddHttpContextAccessor();               //طريقة توصل للـ HttpContext الحالي
-                                                 //، والـ Authentication هو اللي بيحوّل الـ JWT إلى Claims ويحطها في HttpContext.User.
+            builder.Services.AddHttpContextAccessor();               
 
 
 
@@ -217,10 +214,10 @@ namespace Training_Center_Management_API
 
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>(); //بنعمل اوبجيكت من الكلاس
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
 
                 DbSeeder.Seed(context);
-            }      //DI  لل seed
+            }      
 
 
 

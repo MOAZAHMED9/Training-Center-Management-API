@@ -43,7 +43,6 @@ namespace Training_Center_Management_API.Services.CourseInstructorService
 
         public async Task<CourseInstructorDto?> CreateAsync( CreateCourseInstructorDto dto)
         {
-            // Course موجود
             var courseExists = await _context.Courses
                 .AnyAsync(c => c.Id == dto.CourseId);
 
@@ -52,7 +51,6 @@ namespace Training_Center_Management_API.Services.CourseInstructorService
                 return null;
             }
 
-            // Instructor موجود؟
             var instructorExists = await _context.Instructors
                 .AnyAsync(i => i.Id == dto.InstructorId);
 
@@ -61,8 +59,7 @@ namespace Training_Center_Management_API.Services.CourseInstructorService
                 return null;
             }
 
-            // هل الـ Instructor موجود بالفعل
-            // في نفس الـ Course؟
+            
             var alreadyAssigned =
                 await _context.CourseInstructors
                     .AnyAsync(ci =>

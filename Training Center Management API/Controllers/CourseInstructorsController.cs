@@ -22,7 +22,6 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

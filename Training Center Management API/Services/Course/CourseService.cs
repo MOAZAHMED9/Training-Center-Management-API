@@ -2,6 +2,8 @@
 using Training_Center_Management_API.Data;
 using Training_Center_Management_API.Models;
 using Training_Center_Management_API.Dtos.Courses;
+using Training_Center_Management_API.Dtos.common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Training_Center_Management_API.Services.Course
 {
@@ -181,6 +183,7 @@ namespace Training_Center_Management_API.Services.Course
 
             var details = await _context.Courses
                 .Where(c => c.Id == id)
+                .AsNoTracking()
                 .Select(c => new CourseDetails
                 {
                     Id = c.Id,
@@ -214,6 +217,75 @@ namespace Training_Center_Management_API.Services.Course
 
             return details;
 
+
+        }
+
+        public async Task<PagedResultDto<CourseDto>> CourseSearchAsync([FromQuery] CourseSearch search)
+        {
+            var query = _context.Courses.AsQueryable();
+
+            if(!string.IsNullOrEmpty(search.SearchName))
+            {
+                query = query.Where(q => q.Name.Contains(search.SearchName));
+            }
+
+            if (!string.IsNullOrEmpty(search.SortBy))
+            {
+
+
+
+                switch (search.SortBy?.ToLower())
+                {
+                    case "name":
+                        query = (search.Descending) ? query.OrderByDescending(q => q.Name) : query.OrderBy(q => q.Name);
+                        break;
+
+
+                    case "price":
+                        query = search.Descending ? query.OrderByDescending(q => q.Price) : query.OrderBy(q => q.Price);
+                        break;
+
+
+                    default:
+                        query = query.OrderBy(q => q.Id);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderBy(q => q.Id);
+            }
+
+
+            var totalItems = await query.CountAsync();
+            var pagenumber = search.PageNumber < 1 ? 1 : search.PageNumber;
+
+            var courses = await query
+                .Skip((pagenumber - 1) * search.PageSize)
+                .Take(search.PageSize)
+                .Select(c => new CourseDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Price = c.Price,
+                    DurationInHours = c.DurationInHours,
+                    DepartmentId = c.DepartmentId,
+                    DepartmentName = c.Department.Name
+                })
+                .ToListAsync();
+
+            var pageTolal = (int)Math.Ceiling((double)totalItems / search.PageSize);
+
+            return new PagedResultDto<CourseDto>
+            {
+                Page= pagenumber,
+                PageSize= search.PageSize,
+                TotalPages= pageTolal,
+                TotalCount= totalItems,
+                Data= courses
+
+            };
 
         }
     }

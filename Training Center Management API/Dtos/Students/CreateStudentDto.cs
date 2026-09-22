@@ -16,14 +16,15 @@ namespace Training_Center_Management_API.Dtos.Students
         [StringLength(20)]
         public string Phone { get; set; }
 
+        [Required(ErrorMessage = "Address is required.")]
+        [StringLength(200)]
+        public string Address { get; set; }
+
 
         [Required(ErrorMessage = "BirthData is required.")]
         [StringLength(200)]
         public DateTime BirthDate { get; set; }
 
         
-        [Required(ErrorMessage = "Address is required.")]
-        [StringLength(200)]
-        public string Address { get; set; }
     }
 }

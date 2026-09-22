@@ -183,7 +183,7 @@ namespace Training_Center_Management_API.Data
             // =========================
 
             modelBuilder.Entity<Course>()
-                .Property(x => x.Name)
+                .Property(x => x.Name)         // محتاجه يتعملها index unique
                 .IsRequired()
                 .HasMaxLength(150);
 

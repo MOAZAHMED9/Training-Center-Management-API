@@ -31,5 +31,9 @@ namespace Training_Center_Management_API.Services.Student
         //int pageSize = 5,
         //string? sortBy = null,
         //bool descending = false);
+    
+        
+        Task <bool> EditRoleToInstructor(int studentId);
+
     }
 }

@@ -8,7 +8,7 @@ namespace Training_Center_Management_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize (Roles ="Admin")]
+    [Authorize ]
     public class EnrollmentController : ControllerBase
     {
         private readonly IEnrollmentService _enrollmentService;
@@ -19,7 +19,7 @@ namespace Training_Center_Management_API.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("GetAll")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<EnrollmentDto>> GetAll()
         {
@@ -32,7 +32,7 @@ namespace Training_Center_Management_API.Controllers
 
 
         [Authorize(Roles = "Admin, Instructor")]
-        [HttpGet("{id}")]
+        [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var enrollment =
@@ -49,18 +49,15 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(CreateEnrollmentDto dto)
+        [HttpPost("Create")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> Create([FromQuery] CreateEnrollmentDto dto)
         {
-            var enrollment =
-                await _enrollmentService.CreateAsync(dto);
+            var enrollment =await _enrollmentService.CreateAsync(dto);
 
             if (enrollment == null)
             {
-                return BadRequest(
-                    "Student or Course does not exist, " +
-                    "or student is already enrolled.");
+                return BadRequest(" Course does not exist, " + "or student is already enrolled.");
             }
 
             return CreatedAtAction(
@@ -73,15 +70,10 @@ namespace Training_Center_Management_API.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(
-            int id,
-            UpdateEnrollmentDto dto)
+        [Authorize(Policy= "EnrollmentOwner")]
+        public async Task<IActionResult> Update(int id,UpdateEnrollmentDto dto)
         {
-            var result =
-                await _enrollmentService.UpdateAsync(
-                    id,
-                    dto);
+            var result =await _enrollmentService.UpdateAsync(id,dto);
 
             if (!result)
             {

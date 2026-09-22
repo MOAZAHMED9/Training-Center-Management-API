@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Training_Center_Management_API.Data;
@@ -356,6 +357,47 @@ namespace Training_Center_Management_API.Services.Student
             return result;
 
 
+        }
+
+        public async Task<bool> EditRoleToInstructor(int userid)
+        {
+            
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userid);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Role = "Instructor";
+
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.UserId == userid);
+
+            if (student == null)
+            {
+                return false;
+            }
+
+            var instructor = new Instructor
+            {
+                UserId = user.Id,
+                FullName = student.FullName,
+                Email = student.Email,
+                Phone = student.Phone,
+                Specialization = "Not Specified",
+                Salary = 0,
+
+            };
+
+            await _context.Instructors.AddAsync(instructor);
+             student.IsDeleted = true;
+
+            await _context.SaveChangesAsync();
+
+            return true;
 
         }
     }

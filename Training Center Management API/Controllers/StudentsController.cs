@@ -343,6 +343,20 @@ namespace Training_Center_Management_API.Controllers
 
 
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("EditRoleToInstructor/{studentId}")]
+        public async Task<IActionResult> EditRoleToInstructor(int studentId)
+        {
+            var result = await _studentService.EditRoleToInstructor(studentId);
+
+            if (!result)
+            {
+                return NotFound("Student not found or role change failed.");
+            }
+
+            return Ok("Student role changed to Instructor successfully.");
+        }
+
     }
 }
 

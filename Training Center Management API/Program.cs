@@ -9,18 +9,22 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using Training_Center_Management_API.Authorization;
+using Training_Center_Management_API.Authorization.Enrollment;
+using Training_Center_Management_API.Authorization.InstructorOwnerCourse;
+using Training_Center_Management_API.Authorization.StudentOwner;
 using Training_Center_Management_API.Data;
 using Training_Center_Management_API.Middleware;
 using Training_Center_Management_API.Services;
 using Training_Center_Management_API.Services.Auditing;
+using Training_Center_Management_API.Services.certificate;
 using Training_Center_Management_API.Services.Course;
+using Training_Center_Management_API.Services.CourseInstructorService;
+using Training_Center_Management_API.Services.DashBoard;
 using Training_Center_Management_API.Services.Department;
-using Training_Center_Management_API.Services.Student;
 using Training_Center_Management_API.Services.Enrollment;
 using Training_Center_Management_API.Services.Instrucrot;
-using Training_Center_Management_API.Services.CourseInstructorService;
 using Training_Center_Management_API.Services.Payment;
-using Training_Center_Management_API.Services.DashBoard;
+using Training_Center_Management_API.Services.Student;
 
 namespace Training_Center_Management_API
 {
@@ -59,6 +63,8 @@ namespace Training_Center_Management_API
             // Add services to the container.
 
 
+            builder.Services.AddScoped<IAuthorizationHandler, EnrollmentOwnerCourseHandler>(); // حقن ال handler
+            builder.Services.AddScoped<IAuthorizationHandler, InstructorOwnerCourseHandler>(); // حقن ال handler
             builder.Services.AddScoped<IAuthorizationHandler, StudentOwnerOrAdminHandler>(); // حقن ال handler
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();           // audit بنستخدمها لل
             builder.Services.AddScoped<IStudentService, StudentService>();
@@ -69,6 +75,7 @@ namespace Training_Center_Management_API
             builder.Services.AddScoped<ICourseInstructorService, CourseInstructorService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IDashboardService, DashBoardService>();
+            builder.Services.AddScoped<ICertificateService, CertificateService>();
             builder.Services.AddScoped<JwtService>();            // تجهيز ال tocken
 
 
@@ -167,10 +174,32 @@ namespace Training_Center_Management_API
                 {
                     policy.RequireAuthenticatedUser();
 
-                    policy.AddRequirements(
-                        new StudentOwnerOrAdminRequirement());
+                    policy.AddRequirements(new StudentOwnerOrAdminRequirement());
                 });
             });
+
+
+            builder.Services.AddAuthorization(options =>                       // تجهيو الpolice
+            {
+                options.AddPolicy("InstructorOwner", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+
+                    policy.AddRequirements(new InstructorOwnerCourseRequirement());
+                });
+            });
+
+
+            builder.Services.AddAuthorization(options =>                       // تجهيو الpolice
+            {
+                options.AddPolicy("EnrollmentOwner", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+
+                    policy.AddRequirements(new EnrollmentOwnerCourseRequirement());
+                });
+            });
+
 
 
 

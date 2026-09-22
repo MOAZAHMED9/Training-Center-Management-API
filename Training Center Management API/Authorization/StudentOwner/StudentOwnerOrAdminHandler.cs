@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
-namespace Training_Center_Management_API.Authorization
+namespace Training_Center_Management_API.Authorization.StudentOwner
 {
     public class StudentOwnerOrAdminHandler : AuthorizationHandler<StudentOwnerOrAdminRequirement>
     {
-        protected override Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            StudentOwnerOrAdminRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,StudentOwnerOrAdminRequirement requirement)
         {
             // 1. Admin يقدر يشوف أي Student
             if (context.User.IsInRole("Admin"))

@@ -57,24 +57,23 @@ namespace Training_Center_Management_API.Controllers
 
 
 
-        [HttpPost]
-        public async Task<IActionResult> Create(
-            CreatePaymentDto dto)
-        {
-            var payment =
-                await _paymentService.CreateAsync(dto);
+        //[HttpPost]
+        //public async Task<IActionResult> Create(CreatePaymentDto dto)
+        //{
+        //    var payment =
+        //        await _paymentService.CreateAsync(dto);
 
-            if (payment == null)
-            {
-                return BadRequest(
-                    "Student does not exist.");
-            }
+        //    if (payment == null)
+        //    {
+        //        return BadRequest(
+        //            "Student does not exist.");
+        //    }
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = payment.Id },
-                payment);
-        }
+        //    return CreatedAtAction(
+        //        nameof(GetById),
+        //        new { id = payment.Id },
+        //        payment);
+        //}
 
 
 

@@ -2,16 +2,26 @@
 using Microsoft.EntityFrameworkCore;
 using Training_Center_Management_API.Data;
 using Training_Center_Management_API.Dtos.Enrollment;
+using Training_Center_Management_API.Dtos.Certificate;
+using Training_Center_Management_API.Dtos.Payment;
+using Training_Center_Management_API.Services.Auditing;
+using Training_Center_Management_API.Services.Payment;
+using Training_Center_Management_API.Services.certificate;
 
 namespace Training_Center_Management_API.Services.Enrollment
 {
     public class EnrollmentService : IEnrollmentService
     {
         private readonly AppDbContext _context;
-
-        public EnrollmentService(AppDbContext context)
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IPaymentService _paymentService;
+        private readonly ICertificateService _certificateService;
+        public EnrollmentService(AppDbContext context , ICurrentUserService currentUserService, IPaymentService paymentService ,ICertificateService certificateService)
         {
             _context = context;
+            _currentUserService = currentUserService;
+            _paymentService = paymentService;
+            _certificateService = certificateService;
         }
 
 
@@ -66,76 +76,107 @@ namespace Training_Center_Management_API.Services.Enrollment
 
         public async Task<EnrollmentDto?> CreateAsync(CreateEnrollmentDto dto)
         {
-           
-            var studentExists = await _context.Students
-                .AnyAsync(s => s.Id == dto.StudentId);
+           using var transaction = await _context.Database.BeginTransactionAsync();
 
-            if (!studentExists)
+            try
             {
-                return null;
+                var id = _currentUserService.UserId;
+
+
+                var courseExists = await _context.Courses
+                    .FirstOrDefaultAsync(c => c.Id == dto.CourseId);
+
+                if (courseExists is null)
+                {
+                    return null;
+                }
+
+
+                var alreadyEnrolled = await _context.Enrollments.AnyAsync(e => e.StudentId == id.Value && e.CourseId == dto.CourseId);
+
+
+                if (alreadyEnrolled)
+                {
+                    return null;
+                }
+
+
+                var enrollment = new Models.Enrollment
+                {
+                    StudentId = id.Value,
+
+                    CourseId = dto.CourseId,
+
+                    EnrollmentDate = DateTime.UtcNow,
+
+                    Status = "InProgress"
+                };
+
+
+                var payment = new CreatePaymentDto
+                {
+
+                    StudentId = id.Value,
+                    Amount = courseExists.Price,
+                    
+                    PaymentMethod = "paypal",
+                    TransactionReference = Guid.NewGuid().ToString()
+                };
+
+
+                _context.Enrollments.Add(enrollment);
+               
+                await _paymentService.CreateAsync(payment);
+
+
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                
+                return await GetByIdAsync(enrollment.Id);    //// بتحفظو يعدين تجيب الid من الداتا بيز
+            }
+            catch (Exception ex)
+            {
+
+                await transaction.RollbackAsync();
+                throw new Exception("An error occurred while creating the enrollment and payment.", ex);
             }
 
-
-            var courseExists = await _context.Courses
-                .AnyAsync(c => c.Id == dto.CourseId);
-
-            if (!courseExists)
-            {
-                return null;
-            }
-
-
-            var alreadyEnrolled =
-                await _context.Enrollments
-                    .AnyAsync(e => e.StudentId == dto.StudentId && e.CourseId == dto.CourseId);
-
-
-            if (alreadyEnrolled)
-            {
-                return null;
-            }
-
-
-            var enrollment = new Models.Enrollment 
-            {
-                StudentId = dto.StudentId,
-
-                CourseId = dto.CourseId,
-
-                EnrollmentDate = DateTime.UtcNow,
-
-                Status = dto.Status
-            };
-
-
-            _context.Enrollments.Add(enrollment);
-
-            await _context.SaveChangesAsync();
-
-
-            
-            return await GetByIdAsync(enrollment.Id);    //// بتحفظو يعدين تجيب الid من الداتا بيز
         }
 
+       
 
         public async Task<bool> UpdateAsync( int id, UpdateEnrollmentDto dto)
         {
-            var enrollment = await _context.Enrollments
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-            if (enrollment == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return false;
+
+                var enrollment = await _context.Enrollments
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
+                if (enrollment == null)
+                {
+                    return false;
+                }
+
+                enrollment.Status = dto.Status;
+
+                enrollment.Grade = dto.Grade;
+
+                await _certificateService.chickCertificate(enrollment, dto);
+
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+
             }
-
-
-            enrollment.Status = dto.Status;
-
-            enrollment.Grade = dto.Grade;
-
-
-            await _context.SaveChangesAsync();
-
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("An error occurred while updating the enrollment and checking for certificate.", ex);
+            }
             return true;
         }
 

@@ -27,6 +27,83 @@ namespace Training_Center_Management_API.Controllers
         }
 
 
+
+        [EnableRateLimiting("AuthPolicy")]
+        [HttpPost ("Register")]
+        public async Task<IActionResult> Register([FromQuery] RegisterStudentDto dto)
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            using var transaction = await _context.Database.BeginTransactionAsync();
+           try {
+                var existingUser = await _context.Users.AnyAsync(s => s.Email == dto.Email);
+
+                if (existingUser)
+                {
+                    _logger.LogWarning("Registration attempt with existing email: {Email} ip : {ip}", dto.Email, ip);
+                    return BadRequest("Email already exists.");
+                }
+
+                if (dto.Password != dto.ConfirmPassword)
+                {
+                    _logger.LogWarning("Registration attempt with mismatched passwords: {Email} ip : {ip}", dto.Email, ip);
+                    return BadRequest("Passwords do not match.");
+                }
+
+
+                var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+                var user = new User
+                {
+                    FullName = dto.FullName,
+                    Email = dto.Email,
+                    PasswordHash = passwordHash,
+                    Role = "Student",
+                    Student = new Student
+                    {
+                        FullName = dto.FullName,
+                        Email = dto.Email,
+                        Phone = dto.Phone,
+                        BirthDate = dto.BirthDate,
+                        Address = dto.Address,
+                        EnrollmentDate = DateTime.UtcNow,
+                    }
+                };
+
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+
+                var token = _jwtService.GenerateToken(user);
+                var refreshToken = await _jwtService.GenerateRefreshToken(user);
+
+                _logger.LogInformation("New user registered successfully. UserId={UserId}, Email={Email}, IP={IP}", user.Id, user.Email, ip);
+                
+                await transaction.CommitAsync();
+               
+                return Ok(new 
+                {
+
+                    AccessToken = token,
+                    RefreshToken = refreshToken
+                }
+                );
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error occurred during registration. Email={Email}, IP={IP}", dto.Email, ip);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+
+
+
+        }
+
+
+
+
+
+
         [EnableRateLimiting("AuthPolicy")]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)

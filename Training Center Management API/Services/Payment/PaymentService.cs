@@ -60,8 +60,7 @@ namespace Training_Center_Management_API.Services.Payment
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<PaymentDto?> CreateAsync(
-            CreatePaymentDto dto)
+        public async Task<PaymentDto?> CreateAsync(CreatePaymentDto dto)
         {
             // نتأكد إن الطالب موجود
             var studentExists = await _context.Students
@@ -85,7 +84,7 @@ namespace Training_Center_Management_API.Services.Payment
 
             _context.Payments.Add(payment);
 
-            await _context.SaveChangesAsync();
+           
 
             return await GetByIdAsync(payment.Id);
         }
